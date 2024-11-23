@@ -15,6 +15,7 @@ import {
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { differenceInDays } from "date-fns";
+import { motion } from "motion/react";
 
 type TaskItemProps = {
   task: Task;
@@ -126,70 +127,75 @@ const TaskItem = ({ task, saveAllTasks }: TaskItemProps) => {
   };
 
   return (
-    <div
-      className={`bg-white rounded-lg my-4 ${isDragging ? " opacity-50 cursor-grab" : ""}`}
-      ref={drag}
-      onClick={selectTask}
-    >
-      <div className="flex items-center gap-2 p-3">
-        <TickCircle size="20" className="text-dark-300" />
-        <Input
-          value={taskForm.values.name ?? ""}
-          onChange={(e) => onValueChange("name", e.target.value)}
-        />
-      </div>
-      <hr className="border-dark-50" />
-      {task.description ? (
-        <div className="p-3">
-          <p className="text-[16px] text-dark-400">{task.description}</p>
+    <div ref={drag}>
+      <motion.div
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        className={`bg-white rounded-lg my-4 ${isDragging ? " opacity-50 cursor-grab" : ""}`}
+        onClick={selectTask}
+      >
+        <div className="flex items-center gap-2 p-3">
+          <TickCircle size="20" className="text-dark-300" />
+          <Input
+            value={taskForm.values.name ?? ""}
+            onChange={(e) => onValueChange("name", e.target.value)}
+          />
         </div>
-      ) : null}
-      <div className="p-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div>
-            <AssigneeSelector
-              assignees={assignees}
-              selectedAssigneeId={taskForm.values.assigneeId}
-              onAssigneeChange={(assigneeId) =>
-                onValueChange("assigneeId", assigneeId)
-              }
-            >
-              <button className="text-dark-300 text-[13px] border border-dashed border-dark-100 p-1 rounded-full">
-                <User size="18" />
-              </button>
-            </AssigneeSelector>
+        <hr className="border-dark-50" />
+        {task.description ? (
+          <div className="p-3">
+            <p className="text-[16px] text-dark-400">{task.description}</p>
+          </div>
+        ) : null}
+        <div className="p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div>
+              <AssigneeSelector
+                assignees={assignees}
+                selectedAssigneeId={taskForm.values.assigneeId}
+                onAssigneeChange={(assigneeId) =>
+                  onValueChange("assigneeId", assigneeId)
+                }
+              >
+                <button className="text-dark-300 text-[13px] border border-dashed border-dark-100 p-1 rounded-full">
+                  <User size="18" />
+                </button>
+              </AssigneeSelector>
+            </div>
+            <div>
+              <DatePicker
+                selectedDate={taskForm.values.dueDate}
+                onDateChange={(date) => onValueChange("dueDate", date)}
+              >
+                <button className="text-dark-300 text-[13px] border border-dashed border-dark-100 p-1 rounded-full">
+                  <Calendar size="18" />
+                </button>
+              </DatePicker>
+            </div>
           </div>
           <div>
-            <DatePicker
-              selectedDate={taskForm.values.dueDate}
-              onDateChange={(date) => onValueChange("dueDate", date)}
+            <PrioritySelector
+              priority={taskForm.values.priority as TaskPriority}
+              onPriorityChange={(priority) =>
+                onValueChange("priority", priority)
+              }
             >
-              <button className="text-dark-300 text-[13px] border border-dashed border-dark-100 p-1 rounded-full">
-                <Calendar size="18" />
+              <button className="text-dark-300 text-[13px] border border-dashed border-dark-100 p-1 rounded">
+                Set priority
               </button>
-            </DatePicker>
+            </PrioritySelector>
           </div>
         </div>
         <div>
-          <PrioritySelector
-            priority={taskForm.values.priority as TaskPriority}
-            onPriorityChange={(priority) => onValueChange("priority", priority)}
-          >
-            <button className="text-dark-300 text-[13px] border border-dashed border-dark-100 p-1 rounded">
-              Set priority
-            </button>
-          </PrioritySelector>
+          <hr className="border-dark-50" />
+          <p className="p-3 text-[13px] font-medium flex items-center gap-2">
+            <span>
+              <Clock size="16" />
+            </span>{" "}
+            {getDueDateMessage(taskForm.values.dueDate)}
+          </p>
         </div>
-      </div>
-      <div>
-        <hr className="border-dark-50" />
-        <p className="p-3 text-[13px] font-medium flex items-center gap-2">
-          <span>
-            <Clock size="16" />
-          </span>{" "}
-          {getDueDateMessage(taskForm.values.dueDate)}
-        </p>
-      </div>
+      </motion.div>
     </div>
   );
 };
